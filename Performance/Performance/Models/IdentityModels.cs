@@ -44,7 +44,7 @@ namespace Performance.Models
         }
 
 
-        DbSet<Employee> Employees { get; set; }
-        DbSet<DailyStatList> DailyStatLists { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<DailyStatList> DailyStatLists { get; set; }
     }
 }
