@@ -13,6 +13,7 @@ using Performance.Models;
 
 namespace Performance.Controllers
 {
+    [RoutePrefix("api/Stats")]
     public class StatsController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -23,99 +24,106 @@ namespace Performance.Controllers
         //    return db.DailyStatLists;
         //}
 
-        // GET: api/Stats/5
-        [ResponseType(typeof(DailyStatList))]
-        public async Task<IHttpActionResult> GetDailyStatList([FromUri(Name="id")] string employeeId)
+        // GET: api/Stats/5/2016-09-01/2016-09-
+        [Route("{id}/{startDate:DateTime?}/{endDate:DateTime?}")]
+        [ResponseType(typeof(IndividualStatListDTO))]
+        public async Task<IHttpActionResult> GetDailyStatList([FromUri(Name="id")] string employeeId, DateTime? startDate = null, DateTime? endDate = null)
         {
-            DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(employeeId, DateTime.Today);
-            if (dailyStatList == null)
+            DateTime effStartDate = startDate.GetValueOrDefault(DateTime.Today);
+            DateTime effEndDate = endDate.GetValueOrDefault(DateTime.Today);
+            var dailyStatLists = await db.DailyStatLists.Where(x => x.EmployeeId.Equals(employeeId) && x.Date >= effStartDate && x.Date <= effEndDate).ToListAsync();
+            //DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(employeeId, DateTime.Today);
+            IndividualStatListDTO result = IndividualStatListDTO.FromDailyStatLists(dailyStatLists);
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return Ok(dailyStatList);
+            return Ok(result);
         }
 
-        // PUT: api/Stats/5
-        [ResponseType(typeof(void))]
-        public async Task<IHttpActionResult> PutDailyStatList(string id, DailyStatList dailyStatList)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
-            if (id != dailyStatList.EmployeeId)
-            {
-                return BadRequest();
-            }
 
-            db.Entry(dailyStatList).State = EntityState.Modified;
+        //// PUT: api/Stats/5
+        //[ResponseType(typeof(void))]
+        //public async Task<IHttpActionResult> PutDailyStatList(string id, DailyStatList dailyStatList)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!DailyStatListExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    if (id != dailyStatList.EmployeeId)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    db.Entry(dailyStatList).State = EntityState.Modified;
 
-        // POST: api/Stats
-        [ResponseType(typeof(DailyStatList))]
-        public async Task<IHttpActionResult> PostDailyStatList(DailyStatList dailyStatList)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!DailyStatListExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            db.DailyStatLists.Add(dailyStatList);
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
-            try
-            {
-                await db.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (DailyStatListExists(dailyStatList.EmployeeId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //// POST: api/Stats
+        //[ResponseType(typeof(DailyStatList))]
+        //public async Task<IHttpActionResult> PostDailyStatList(DailyStatList dailyStatList)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-            return CreatedAtRoute("DefaultApi", new { id = dailyStatList.EmployeeId }, dailyStatList);
-        }
+        //    db.DailyStatLists.Add(dailyStatList);
 
-        // DELETE: api/Stats/5
-        [ResponseType(typeof(DailyStatList))]
-        public async Task<IHttpActionResult> DeleteDailyStatList(string id)
-        {
-            DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(id);
-            if (dailyStatList == null)
-            {
-                return NotFound();
-            }
+        //    try
+        //    {
+        //        await db.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateException)
+        //    {
+        //        if (DailyStatListExists(dailyStatList.EmployeeId))
+        //        {
+        //            return Conflict();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            db.DailyStatLists.Remove(dailyStatList);
-            await db.SaveChangesAsync();
+        //    return CreatedAtRoute("DefaultApi", new { id = dailyStatList.EmployeeId }, dailyStatList);
+        //}
 
-            return Ok(dailyStatList);
-        }
+        //// DELETE: api/Stats/5
+        //[ResponseType(typeof(DailyStatList))]
+        //public async Task<IHttpActionResult> DeleteDailyStatList(string id)
+        //{
+        //    DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(id);
+        //    if (dailyStatList == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    db.DailyStatLists.Remove(dailyStatList);
+        //    await db.SaveChangesAsync();
+
+        //    return Ok(dailyStatList);
+        //}
 
         protected override void Dispose(bool disposing)
         {
