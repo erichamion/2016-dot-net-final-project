@@ -7,10 +7,12 @@
     return year + "-" + twoDigitMonth + "-" + twoDigitDay;
 }
 
+
+
 var mainApp = angular.module("performanceApp", [])
     .controller("statController", function ($scope, $http) {
         $scope.update = function () {
-            var url = baseUrl + $scope.employeeId;
+            var url = $scope.baseUrl + $scope.employeeId;
             $scope.startDateDescription = "Today";
             $scope.endDateDescription = "Today";
             if ($scope.startDate) {
@@ -30,7 +32,7 @@ var mainApp = angular.module("performanceApp", [])
                 });
         };
 
-        var baseUrl = "/api/Stats/";
+        $scope.baseUrl = "/api/Stats/";
         $scope.update();
 
     });

@@ -1,8 +1,17 @@
 ﻿<div ng-app="performanceApp" ng-controller="statController" class="content">
-    <span>Employee ID: </span><input type="text" ng-model="employeeId" ng-change="update()" />
-    <span>From Date: </span><input type="date" ng-model="startDate" ng-change="update()" />
-    <span>To Date: </span><input type="date" ng-model="endDate" ng-change="update()" ng-min="startDate" min="{{startDate | date:'yyyy-MM-dd'}}" ng-disabled="!startDate" />
-    <div ng-bind="employeeId"></div>
+    <form name="employeeSelection">
+        <label for="statType">Information Type: </label>
+        <select name="statType" ng-model="baseUrl" ng-change="update()">
+            <option value="/api/Stats/">Individual Agent</option>
+            <option value="/api/TeamStats/">Team (reporting to selected employee)</option>
+        </select>
+        <label for="employeeId">Employee ID: </label>
+        <input name="employeeId" type="text" ng-model="employeeId" ng-change="update()" />
+        <label for="startDate">From Date: </label>
+        <input name="startDate" type="date" ng-model="startDate" ng-change="update()" />
+        <label for="endDate" ng-disabled="!startDate">To Date: </label>
+        <input name="endDate" type="date" ng-model="endDate" ng-change="update()" ng-min="startDate" min="{{startDate | date:'yyyy-MM-dd'}}" ng-disabled="!startDate" />
+    </form>
     <div>
         <h3 ng-show="employeeId">{{employeeId}}: {{startDateDescription}} &ndash; {{endDateDescription}}</h3>
         <h3 ng-hide="employeeId">Please select an employee.</h3>
