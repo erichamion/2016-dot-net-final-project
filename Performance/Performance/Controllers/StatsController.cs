@@ -31,9 +31,7 @@ namespace Performance.Controllers
         {
             DateTime effStartDate = startDate.GetValueOrDefault(DateTime.Today);
             DateTime effEndDate = endDate.GetValueOrDefault(DateTime.Today);
-            var dailyStatLists = await db.DailyStatLists.Where(x => x.EmployeeId.Equals(employeeId) && x.Date >= effStartDate && x.Date <= effEndDate).ToListAsync();
-            //DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(employeeId, DateTime.Today);
-            IndividualStatListDTO result = IndividualStatListDTO.FromDailyStatLists(dailyStatLists);
+            IndividualStatListDTO result = await IndividualStatListDTO.FromEmployeeIdAsync(db.DailyStatLists, employeeId, effStartDate, effEndDate);
             if (result == null)
             {
                 return NotFound();

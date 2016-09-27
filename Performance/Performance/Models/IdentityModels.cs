@@ -41,6 +41,8 @@ namespace Performance.Models
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<DailyStatList>().HasKey(x => new { x.EmployeeId, x.Date });
+
+            modelBuilder.Entity<Employee>().HasOptional<Employee>(x => x.Manager).WithMany(x => x.Subordinates);
         }
 
 
