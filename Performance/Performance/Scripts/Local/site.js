@@ -61,30 +61,51 @@ var mainApp = angular.module("performanceApp", [], function ($httpProvider) {
 
 
 
-mainApp.controller("statController", function ($scope, $http) {
-    $scope.update = function () {
-        var url = $scope.baseUrl + $scope.employeeId;
-        $scope.startDateDescription = "Today";
-        $scope.endDateDescription = "Today";
-        if ($scope.startDate) {
-            $scope.startDateDescription = DateToYMD($scope.startDate);
-            url += "/" + $scope.startDateDescription;
-            if ($scope.endDate) {
-                $scope.endDateDescription = DateToYMD($scope.endDate);
-                url += "/" + $scope.endDateDescription;
-            }
-        }
-        $http.get(url)
-            .success(function (resp) {
-                $scope.stats = resp;
-            })
-            .error(function(resp) {
-                $scope.stats = undefined;
-            });
+mainApp.controller("mainController", function ($scope, $http) {
+    $scope.getWithAuth = function (url) {
+        return $http.get(url, getAuthConfig());
     };
 
-    $scope.baseUrl = "/api/Stats/";
-    $scope.update();
+    function getAuthConfig() {
+        return {
+            headers: {
+                Authentication: 'Bearer ' + $scope.token
+            }
+        };
+    }
+
+    $scope.token = null;
+    
+
+
+})
+    .controller("statController", function ($scope, $http) {
+        $scope.update = function () {
+            var url = $scope.baseUrl + $scope.employeeId;
+            $scope.startDateDescription = "Today";
+            $scope.endDateDescription = "Today";
+            if ($scope.startDate) {
+                $scope.startDateDescription = DateToYMD($scope.startDate);
+                url += "/" + $scope.startDateDescription;
+                if ($scope.endDate) {
+                    $scope.endDateDescription = DateToYMD($scope.endDate);
+                    url += "/" + $scope.endDateDescription;
+                }
+            }
+            $scope.getWithAuth(url)
+            //$http.get(url)
+                .then(function (resp) {
+                    // Success
+                    $scope.stats = resp.data;
+                },
+                function (resp) {
+                    // Failure
+                    $scope.stats = undefined;
+                });
+        };
+
+        $scope.baseUrl = "/api/Stats/";
+        $scope.update();
 
     })
     .controller("loginController", function ($scope, $http) {
@@ -93,11 +114,13 @@ mainApp.controller("statController", function ($scope, $http) {
                 $scope.loginUrl, 
                 { username: loginInfo.employeeId, password: loginInfo.password, grant_type: 'password' }
                 )
-                .success(function (resp) {
-                    $scope.$parent.token = resp.access_token;
+                .then(function (resp) {
+                    // Success
+                    $scope.$parent.token = resp.data.access_token;
                     $scope.$parent.loggedInEmployeeId = loginInfo.employeeId;
-                })
-                .error(function(resp) {
+                },
+                function (resp) {
+                    // Failure
                     alert("Login failed");
                 });
         };
