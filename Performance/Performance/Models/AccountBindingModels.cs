@@ -35,7 +35,11 @@ namespace Performance.Models
     public class RegisterBindingModel
     {
         [Required]
-        [Display(Name = "Email")]
+        [Display(Name = "Employee ID")]
+        public string EmployeeId { get; set; }
+
+        [Required]
+        [Display(Name = "Email Address")]
         public string Email { get; set; }
 
         [Required]
@@ -50,12 +54,12 @@ namespace Performance.Models
         public string ConfirmPassword { get; set; }
     }
 
-    public class RegisterExternalBindingModel
-    {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-    }
+    //public class RegisterExternalBindingModel
+    //{
+    //    [Required]
+    //    [Display(Name = "Email")]
+    //    public string Email { get; set; }
+    //}
 
     public class RemoveLoginBindingModel
     {

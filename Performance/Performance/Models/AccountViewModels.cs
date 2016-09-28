@@ -18,6 +18,8 @@ namespace Performance.Models
     {
         public string LocalLoginProvider { get; set; }
 
+        public string EmployeeId { get; set; }
+
         public string Email { get; set; }
 
         public IEnumerable<UserLoginInfoViewModel> Logins { get; set; }
@@ -27,6 +29,8 @@ namespace Performance.Models
 
     public class UserInfoViewModel
     {
+        public string EmployeeId { get; set; }
+
         public string Email { get; set; }
 
         public bool HasRegistered { get; set; }

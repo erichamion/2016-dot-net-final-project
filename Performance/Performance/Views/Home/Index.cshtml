@@ -1,26 +1,36 @@
 ﻿<div ng-app="performanceApp" ng-controller="statController" class="content">
-    <form name="employeeSelection">
-        <label for="statType">Information Type: </label>
-        <select name="statType" ng-model="baseUrl" ng-change="update()">
-            <option value="/api/Stats/">Individual Agent</option>
-            <option value="/api/TeamStats/">Team (reporting to selected employee)</option>
-        </select>
-        <label for="employeeId">Employee ID: </label>
-        <input name="employeeId" type="text" ng-model="employeeId" ng-change="update()" />
-        <label for="startDate">From Date: </label>
-        <input name="startDate" type="date" ng-model="startDate" ng-change="update()" />
-        <label for="endDate" ng-disabled="!startDate">To Date: </label>
-        <input name="endDate" type="date" ng-model="endDate" ng-change="update()" ng-min="startDate" min="{{startDate | date:'yyyy-MM-dd'}}" ng-disabled="!startDate" />
-    </form>
-    <div>
-        <h3 ng-show="employeeId">{{employeeId}}: {{startDateDescription}} &ndash; {{endDateDescription}}</h3>
-        <h3 ng-hide="employeeId">Please select an employee.</h3>
-        <div class="error-empty" ng-hide="stats">
-            No data for employee {{employeeId}}
+    <div class="login" ng-hide="token" ng-controller="loginController">
+        <form name="loginForm" action="javascript:void(0);">
+            <input name="employeeId" type="text" ng-model="login.employeeId" />
+            <input name="password" type="password" ng-model="login.password" />
+            <input name="submit" type="submit" value="Submit" ng-click="submitLogin(login)" />
+        </form>
+
+    </div>
+    <div class="securedContent" ng-show="token">
+        <form name="employeeSelection">
+            <label for="statType">Information Type: </label>
+            <select name="statType" ng-model="baseUrl" ng-change="update()">
+                <option value="/api/Stats/">Individual Agent</option>
+                <option value="/api/TeamStats/">Team (reporting to selected employee)</option>
+            </select>
+            <label for="employeeId">Employee ID: </label>
+            <input name="employeeId" type="text" ng-model="employeeId" ng-change="update()" />
+            <label for="startDate">From Date: </label>
+            <input name="startDate" type="date" ng-model="startDate" ng-change="update()" />
+            <label for="endDate" ng-disabled="!startDate">To Date: </label>
+            <input name="endDate" type="date" ng-model="endDate" ng-change="update()" ng-min="startDate" min="{{startDate | date:'yyyy-MM-dd'}}" ng-disabled="!startDate" />
+        </form>
+        <div>
+            <h3 ng-show="employeeId">{{employeeId}}: {{startDateDescription}} &ndash; {{endDateDescription}}</h3>
+            <h3 ng-hide="employeeId">Please select an employee.</h3>
+            <div class="error-empty" ng-hide="stats">
+                No data for employee {{employeeId}}
+            </div>
+            <table ng-show="stats">
+                <tr><th ng-repeat="(key,val) in stats">{{key}}</th></tr>
+                <tr><td ng-repeat="(key,val) in stats">{{val}}</td></tr>
+            </table>
         </div>
-        <table ng-show="stats">
-            <tr><th ng-repeat="(key,val) in stats">{{key}}</th></tr>
-            <tr><td ng-repeat="(key,val) in stats">{{val}}</td></tr>
-        </table>
     </div>
 </div>
