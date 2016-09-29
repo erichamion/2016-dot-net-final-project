@@ -1,5 +1,5 @@
 ﻿<div ng-app="performanceApp" ng-controller="mainController" class="content">
-    <div class="login" ng-hide="token" ng-controller="loginController">
+    <div class="login" ng-hide="token">
         <h3>Please log in</h3>
         <form name="loginForm" action="javascript:void(0);">
             <label>Employee ID: <input name="employeeId" type="text" ng-model="login.employeeId" /></label>
@@ -30,5 +30,6 @@
                 <tr><td ng-repeat="(key,val) in stats">{{val}}</td></tr>
             </table>
         </div>
+        <div class="logout"><a href="javascript:void(0);" ng-click="logout()">Logout</a></div>
     </div>
 </div>

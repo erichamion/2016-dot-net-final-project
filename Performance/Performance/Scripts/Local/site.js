@@ -66,6 +66,10 @@ mainApp.controller("mainController", function ($scope, $http) {
         return $scope.token ? $http.get(url, getAuthConfig()) : $http.get(url);
     };
 
+    $scope.post = function (url, data) {
+        return $scope.token ? $http.post(url, data, getAuthConfig()) : $http.post(url, data);
+    };
+
     function getAuthConfig() {
         return {
             headers: {
@@ -74,6 +78,29 @@ mainApp.controller("mainController", function ($scope, $http) {
         };
     }
 
+    $scope.submitLogin = function (loginInfo) {
+        $http.post(
+            $scope.loginUrl, 
+            { username: loginInfo.employeeId, password: loginInfo.password, grant_type: 'password' }
+            )
+            .then(function (resp) {
+                // Success
+                $scope.token = resp.data.access_token;
+                $scope.loggedInEmployeeId = loginInfo.employeeId;
+            },
+            function (resp) {
+                // Failure
+                alert("Login failed");
+            });
+    };
+
+    $scope.logout = function () {
+        $scope.post($scope.logoutUrl);
+        $scope.token = null;
+    }
+
+    $scope.loginUrl = "/Token";
+    $scope.logoutUrl = "/api/Account/Logout";
     $scope.token = null;
     
 
@@ -105,27 +132,5 @@ mainApp.controller("mainController", function ($scope, $http) {
 
         $scope.baseUrl = "/api/Stats/";
         $scope.update();
-
-    })
-    .controller("loginController", function ($scope, $http) {
-        $scope.submitLogin = function (loginInfo) {
-            $http.post(
-                $scope.loginUrl, 
-                { username: loginInfo.employeeId, password: loginInfo.password, grant_type: 'password' }
-                )
-                .then(function (resp) {
-                    // Success
-                    $scope.$parent.token = resp.data.access_token;
-                    $scope.$parent.loggedInEmployeeId = loginInfo.employeeId;
-                },
-                function (resp) {
-                    // Failure
-                    alert("Login failed");
-                });
-        };
-
-        
-
-        $scope.loginUrl = "/Token";
 
     });
