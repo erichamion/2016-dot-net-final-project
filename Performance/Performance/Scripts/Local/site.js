@@ -29,13 +29,13 @@ var mainApp = angular.module("performanceApp", [], function ($httpProvider) {
         value = obj[name];
         
         if(value instanceof Array) {
-        for(i=0; i<value.length; ++i) {
-            subValue = value[i];
-            fullSubName = name + '[' + i + ']';
-            innerObj = {};
-            innerObj[fullSubName] = subValue;
-            query += param(innerObj) + '&';
-        }
+            for(i=0; i<value.length; ++i) {
+                subValue = value[i];
+                fullSubName = name + '[' + i + ']';
+                innerObj = {};
+                innerObj[fullSubName] = subValue;
+                query += param(innerObj) + '&';
+            }
         }
         else if(value instanceof Object) {
         for(subName in value) {
@@ -87,9 +87,11 @@ mainApp.controller("mainController", function ($scope, $http) {
                 // Success
                 $scope.token = resp.data.access_token;
                 $scope.loggedInEmployeeId = loginInfo.employeeId;
+                $scope.clearLoginForm();
             },
             function (resp) {
                 // Failure
+                $scope.clearLoginForm();
                 alert("Login failed");
             });
     };
@@ -97,6 +99,11 @@ mainApp.controller("mainController", function ($scope, $http) {
     $scope.logout = function () {
         $scope.post($scope.logoutUrl);
         $scope.token = null;
+    }
+
+    $scope.clearLoginForm = function () {
+        $scope.login.employeeId = "";
+        $scope.login.password = "";
     }
 
     $scope.loginUrl = "/Token";
