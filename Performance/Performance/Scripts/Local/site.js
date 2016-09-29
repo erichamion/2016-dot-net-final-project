@@ -62,14 +62,14 @@ var mainApp = angular.module("performanceApp", [], function ($httpProvider) {
 
 
 mainApp.controller("mainController", function ($scope, $http) {
-    $scope.getWithAuth = function (url) {
-        return $http.get(url, getAuthConfig());
+    $scope.get = function (url) {
+        return $scope.token ? $http.get(url, getAuthConfig()) : $http.get(url);
     };
 
     function getAuthConfig() {
         return {
             headers: {
-                Authentication: 'Bearer ' + $scope.token
+                Authorization: 'Bearer ' + $scope.token
             }
         };
     }
@@ -92,8 +92,7 @@ mainApp.controller("mainController", function ($scope, $http) {
                     url += "/" + $scope.endDateDescription;
                 }
             }
-            $scope.getWithAuth(url)
-            //$http.get(url)
+            $scope.get(url)
                 .then(function (resp) {
                     // Success
                     $scope.stats = resp.data;

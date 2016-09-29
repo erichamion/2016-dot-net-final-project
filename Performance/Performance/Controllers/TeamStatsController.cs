@@ -13,6 +13,7 @@ using Performance.Models;
 
 namespace Performance.Controllers
 {
+    [Authorize]
     [RoutePrefix("api/TeamStats")]
     public class TeamStatsController : ApiController
     {
