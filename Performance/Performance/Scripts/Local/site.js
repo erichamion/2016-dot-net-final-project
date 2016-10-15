@@ -61,23 +61,15 @@ var mainApp = angular.module("performanceApp", ['ngStorage'], function ($httpPro
 
 
 
-mainApp.controller("mainController", function ($scope, $http, $sessionStorage) {
+mainApp.controller("mainController", function ($scope, $http, $sessionStorage, $q) {
     
     $scope.get = function (url) {
-        return $scope.$storage.token ? $http.get(url, getAuthConfig()) : $http.get(url);
+        return $scope.$storage.token ? httpGetWithAuth(url) : $http.get(url);
     };
 
     $scope.post = function (url, data) {
         return $scope.$storage.token ? $http.post(url, data, getAuthConfig()) : $http.post(url, data);
     };
-
-    function getAuthConfig() {
-        return {
-            headers: {
-                Authorization: 'Bearer ' + $scope.$storage.token
-            }
-        };
-    }
 
     $scope.submitLogin = function (loginInfo) {
         $http.post(
@@ -106,6 +98,39 @@ mainApp.controller("mainController", function ($scope, $http, $sessionStorage) {
         $scope.login.employeeId = "";
         $scope.login.password = "";
     }
+
+    function getAuthConfig() {
+        return {
+            headers: {
+                Authorization: 'Bearer ' + $scope.$storage.token
+            }
+        };
+    }
+
+    function httpGetWithAuth(url) {
+        return $http.get(url, getAuthConfig())
+            .catch(function (resp) {
+                if (resp.status === 401) {
+                    // Not authenticated, or authentication expired. Token is not valid.
+
+                    alert('Login session has expired. Please enter your credentials.');
+
+                    // Kill the stored token (don't call $scope.logout because there's no need
+                    // to send a logout request to the server).
+                    delete $scope.$storage.token;
+
+                    // Return an empty object just to appease anything that might be waiting on
+                    // the results of this call.
+                    return {};
+                } else {
+                    // Request failed for some reason other than lack of authentication. 
+                    // Pass the failure on.
+                    return $q.reject(resp);
+                }
+            });
+    }
+
+
 
     $scope.$storage = $sessionStorage;
     $scope.loginUrl = "/Token";
