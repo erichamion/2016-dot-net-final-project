@@ -9,7 +9,7 @@
 
 
 
-var mainApp = angular.module("performanceApp", [], function ($httpProvider) {
+var mainApp = angular.module("performanceApp", ['ngStorage'], function ($httpProvider) {
     // Code to make POST requests use url-encoded string instead of JSON
     // from http://victorblog.com/2012/12/20/make-angularjs-http-service-behave-like-jquery-ajax/
 
@@ -61,19 +61,20 @@ var mainApp = angular.module("performanceApp", [], function ($httpProvider) {
 
 
 
-mainApp.controller("mainController", function ($scope, $http) {
+mainApp.controller("mainController", function ($scope, $http, $sessionStorage) {
+    
     $scope.get = function (url) {
-        return $scope.token ? $http.get(url, getAuthConfig()) : $http.get(url);
+        return $scope.$storage.token ? $http.get(url, getAuthConfig()) : $http.get(url);
     };
 
     $scope.post = function (url, data) {
-        return $scope.token ? $http.post(url, data, getAuthConfig()) : $http.post(url, data);
+        return $scope.$storage.token ? $http.post(url, data, getAuthConfig()) : $http.post(url, data);
     };
 
     function getAuthConfig() {
         return {
             headers: {
-                Authorization: 'Bearer ' + $scope.token
+                Authorization: 'Bearer ' + $scope.$storage.token
             }
         };
     }
@@ -85,7 +86,7 @@ mainApp.controller("mainController", function ($scope, $http) {
             )
             .then(function (resp) {
                 // Success
-                $scope.token = resp.data.access_token;
+                $scope.$storage.token = resp.data.access_token;
                 $scope.loggedInEmployeeId = loginInfo.employeeId;
                 $scope.clearLoginForm();
             },
@@ -98,7 +99,7 @@ mainApp.controller("mainController", function ($scope, $http) {
 
     $scope.logout = function () {
         $scope.post($scope.logoutUrl);
-        $scope.token = null;
+        delete $scope.$storage.token;
     }
 
     $scope.clearLoginForm = function () {
@@ -106,9 +107,9 @@ mainApp.controller("mainController", function ($scope, $http) {
         $scope.login.password = "";
     }
 
+    $scope.$storage = $sessionStorage;
     $scope.loginUrl = "/Token";
     $scope.logoutUrl = "/api/Account/Logout";
-    $scope.token = null;
     
 
 

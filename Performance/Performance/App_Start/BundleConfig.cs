@@ -23,6 +23,11 @@ namespace Performance
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/sitejs").Include(
+                      "~/Scripts/angular.js",
+                      "~/Scripts/ngStorage.js",
+                      "~/Scripts/Local/site.js"));
         }
     }
 }
