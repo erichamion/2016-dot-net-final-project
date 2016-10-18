@@ -15,128 +15,23 @@ namespace Performance.Controllers
 {
     [Authorize]
     [RoutePrefix("api/TeamStats")]
-    public class TeamStatsController : ApiController
+    public class TeamStatsController : AbstractStatsController
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-
-        //// GET: api/Stats
-        //public IQueryable<DailyStatList> GetDailyStatLists()
-        //{
-        //    return db.DailyStatLists;
-        //}
-
         // GET: api/Stats/5/2016-09-01/2016-09-
         [Route("{managerId}/{startDate:DateTime?}/{endDate:DateTime?}")]
         [ResponseType(typeof(TeamStatListDTO))]
-        public async Task<IHttpActionResult> GetDailyStatList(string managerId, DateTime? startDate = null, DateTime? endDate = null)
+        public override async Task<IHttpActionResult> GetDailyStatList(string managerId, DateTime? startDate = null, DateTime? endDate = null)
         {
+            if (!await CanAccessEmployeeAsync(managerId)) return NotFound();
+
             DateTime effStartDate = startDate.GetValueOrDefault(DateTime.Today);
             DateTime effEndDate = endDate.GetValueOrDefault(DateTime.Today);
             var managerQuery = await db.Employees.FindAsync(managerId);
             TeamStatListDTO result = await TeamStatListDTO.FromManagerAsync(db, managerQuery, effStartDate, effEndDate);
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            
+            return (result != null) ? (IHttpActionResult)Ok(result) : NotFound();
         }
-
-
-
-        //// PUT: api/Stats/5
-        //[ResponseType(typeof(void))]
-        //public async Task<IHttpActionResult> PutDailyStatList(string id, DailyStatList dailyStatList)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (id != dailyStatList.EmployeeId)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    db.Entry(dailyStatList).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!DailyStatListExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
-
-        //// POST: api/Stats
-        //[ResponseType(typeof(DailyStatList))]
-        //public async Task<IHttpActionResult> PostDailyStatList(DailyStatList dailyStatList)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    db.DailyStatLists.Add(dailyStatList);
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateException)
-        //    {
-        //        if (DailyStatListExists(dailyStatList.EmployeeId))
-        //        {
-        //            return Conflict();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return CreatedAtRoute("DefaultApi", new { id = dailyStatList.EmployeeId }, dailyStatList);
-        //}
-
-        //// DELETE: api/Stats/5
-        //[ResponseType(typeof(DailyStatList))]
-        //public async Task<IHttpActionResult> DeleteDailyStatList(string id)
-        //{
-        //    DailyStatList dailyStatList = await db.DailyStatLists.FindAsync(id);
-        //    if (dailyStatList == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    db.DailyStatLists.Remove(dailyStatList);
-        //    await db.SaveChangesAsync();
-
-        //    return Ok(dailyStatList);
-        //}
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        private bool DailyStatListExists(string id)
-        {
-            return db.DailyStatLists.Count(e => e.EmployeeId == id) > 0;
-        }
+        
+        
     }
 }

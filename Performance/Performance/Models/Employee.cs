@@ -25,18 +25,38 @@ namespace Performance.Models
 
         public virtual ICollection<Employee> Subordinates { get; set; }
 
-        public List<Employee> GetChainOfCommand(bool includeSelf)
-        {
-            List<Employee> result = new List<Employee>();
+        //public List<Employee> GetChainOfCommand(bool includeSelf)
+        //{
+        //    List<Employee> result = new List<Employee>();
 
-            Employee currentEmployee = includeSelf ? this : Manager;
+        //    Employee currentEmployee = includeSelf ? this : Manager;
+        //    while (currentEmployee != null)
+        //    {
+        //        result.Add(currentEmployee);
+        //        currentEmployee = Manager;
+        //    }
+
+        //    return result;
+        //}
+
+        public bool IsIndirectManagerOf(Employee target, int minSeparation = 0)
+        {
+            Employee currentEmployee = target;
+            int separation = 0;
+            
             while (currentEmployee != null)
             {
-                result.Add(currentEmployee);
-                currentEmployee = Manager;
+                if (currentEmployee.Id == this.Id)
+                {
+                    return (separation >= minSeparation);
+                }
+                separation++;
+                currentEmployee = currentEmployee.Manager;
             }
 
-            return result;
+            return false;
         }
+
+        
     }
 }
